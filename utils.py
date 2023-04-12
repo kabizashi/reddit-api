@@ -17,6 +17,19 @@ def gen_timestamp_str(timestamp: str) -> str:
     return datetime.strftime(timestamp, '%H-%M-%S.%d-%m-%y')
 
 
+def utc_to_date(timestamp: float) -> str:
+    """
+    Converts a UTC float timestamp to a date string in the format 'HH-MM-SS.DD-MM-YY'.
+
+    Parameters:
+        timestamp (float): A UTC float timestamp.
+
+    Returns:
+        A string representation of the timestamp in the format 'HH-MM-SS.DD-MM-YY'.
+    """
+    return gen_timestamp_str(datetime.utcfromtimestamp(timestamp))
+
+
 def str_to_datetime(time_string: str) -> str:
     """
     Converts a string representation of a date in the format 'DD-MM-YY' to a datetime object.
@@ -30,7 +43,7 @@ def str_to_datetime(time_string: str) -> str:
     return datetime.strptime(time_string, '%d-%m-%y')
 
 
-def dict_to_csv(data: dict) -> None:
+def data_to_csv(data, filename='') -> None:
     """
     Given a dictionary of data, creates a pandas DataFrame and writes it to a CSV file
     with a filename in the format 'posts-HH-MM-SS.DD-MM-YY.csv', where the timestamp
@@ -45,8 +58,14 @@ def dict_to_csv(data: dict) -> None:
 
     now = datetime.now()
     timestamp_str = gen_timestamp_str(now)
-    dataframe = pd.DataFrame.from_dict(data)
-    filename = f'posts-{timestamp_str}.csv'
+    filename = f'posts-{timestamp_str}.csv' if filename != '' else 'posts.csv'
+
+    if type(data) == 'dict':
+        dataframe = pd.DataFrame.from_dict(data)
+
+    else:
+        dataframe = pd.DataFrame(list, columns=['title', 'text', 'ups', 'downs', 'link_flair_text',
+                                                'upvote_ratio', 'num_comments', 'created_utc', 'url', 'permalink'])
 
     dataframe.to_csv(filename, sep=',')
 
