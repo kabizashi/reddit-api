@@ -3,7 +3,7 @@ import pandas as pd
 from datetime import datetime
 
 
-def gen_timestamp_str(timestamp: str) -> str:
+def datetime_to_str(timestamp: str) -> str:
     """
     Given a string representation of a timestamp, returns a string
     representation of the timestamp in the format 'HH-MM-SS.DD-MM-YY'.
@@ -27,7 +27,7 @@ def utc_to_date(timestamp: float) -> str:
     Returns:
         A string representation of the timestamp in the format 'HH-MM-SS.DD-MM-YY'.
     """
-    return gen_timestamp_str(datetime.utcfromtimestamp(timestamp))
+    return datetime.utcfromtimestamp(timestamp)
 
 
 def str_to_datetime(time_string: str) -> str:
@@ -57,16 +57,15 @@ def data_to_csv(data, filename='') -> None:
     """
 
     now = datetime.now()
-    timestamp_str = gen_timestamp_str(now)
+    timestamp_str = datetime_to_str(now)
     filename = f'posts-{timestamp_str}.csv' if filename != '' else 'posts.csv'
 
     if type(data) == 'dict':
         dataframe = pd.DataFrame.from_dict(data)
 
     else:
-        dataframe = pd.DataFrame(list, columns=['title', 'text', 'ups', 'downs', 'link_flair_text',
+        dataframe = pd.DataFrame(data, columns=['title', 'text', 'ups', 'downs', 'link_flair_text',
                                                 'upvote_ratio', 'num_comments', 'created_utc', 'url', 'permalink'])
 
     dataframe.to_csv(filename, sep=',')
-
     print(f'> data written to {filename}!')

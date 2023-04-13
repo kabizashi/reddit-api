@@ -86,7 +86,7 @@ class Reddit:
         end_date = utils.str_to_datetime(end_date)
         posts = []
 
-        while current_date > end_date:
+        while current_date > end_date and len(posts) < 1_000:
             url = f'{self.BASE_URL}r/{subreddit}/{mode}?after={after}'
             print(f'> fetching posts from {url}...')
             response = requests.get(url, params=params, headers=headers)
@@ -94,7 +94,6 @@ class Reddit:
 
             for post in response_data['children']:
                 post = post['data']
-                created_utc = utils.utc_to_date(post['created_utc'])
 
                 posts.append({
                     'title': post['title'].lower(),
@@ -104,17 +103,12 @@ class Reddit:
                     'link_flair_text': post['link_flair_text'],
                     'upvote_ratio': post['upvote_ratio'],
                     'num_comments': post['num_comments'],
-                    'created_utc': created_utc,
+                    'created_utc': utils.datetime_to_str(utils.utc_to_date(post['created_utc'])),
                     'url': post['url'],
                     'permalink': post['permalink'],
                 })
 
-            print(current_date)
-            current_date = utils.str_to_datetime(created_utc)
-
-            if after == response_data['after']:
-                break
-
+            current_date = utils.utc_to_date(post['created_utc'])
             after = response_data['after']
 
         print('> done!')
