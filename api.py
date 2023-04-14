@@ -86,7 +86,7 @@ class Reddit:
         end_date = utils.str_to_datetime(end_date)
         posts = []
 
-        while current_date > end_date and len(posts) < 1_000:
+        while current_date > end_date and after != None:
             url = f'{self.BASE_URL}r/{subreddit}/{mode}?after={after}'
             print(f'> fetching posts from {url}...')
             response = requests.get(url, params=params, headers=headers)
@@ -103,34 +103,21 @@ class Reddit:
                     'link_flair_text': post['link_flair_text'],
                     'upvote_ratio': post['upvote_ratio'],
                     'num_comments': post['num_comments'],
-                    'created_utc': utils.datetime_to_str(utils.utc_to_date(post['created_utc'])),
+                    'timestamp': utils.datetime_to_str(utils.utc_to_datetime(post['created_utc'])),
                     'url': post['url'],
                     'permalink': post['permalink'],
                 })
 
-            current_date = utils.utc_to_date(post['created_utc'])
+            current_date = utils.utc_to_datetime(post['created_utc'])
             after = response_data['after']
 
         print('> done!')
 
-        return posts
-
-    @staticmethod
-    def parse_data(posts: list) -> None:
-        """
-        Parses and returns data from a Reddit API response.
-
-        Parameters:
-            data (dict): The JSON data returned from a Reddit API response.
-
-        Returns:
-            A dictionary containing the parsed data.
-        """
         utils.data_to_csv(posts)
+        return posts
 
 
 if __name__ == '__main__':
     api = Reddit()
     data = api.fetch_posts(
         'conversas', start_date='01-03-23', end_date='01-03-22', limit=100)
-    api.parse_data(data)

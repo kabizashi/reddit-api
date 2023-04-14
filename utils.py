@@ -14,10 +14,10 @@ def datetime_to_str(timestamp: str) -> str:
     Returns:
         A string representation of the timestamp in the format 'HH-MM-SS.DD-MM-YY'.
     """
-    return datetime.strftime(timestamp, '%H-%M-%S.%d-%m-%y')
+    return datetime.strftime(timestamp, '%H:%M:%S|%d-%m-%y')
 
 
-def utc_to_date(timestamp: float) -> str:
+def utc_to_datetime(timestamp: float) -> str:
     """
     Converts a UTC float timestamp to a date string in the format 'HH-MM-SS.DD-MM-YY'.
 
@@ -64,8 +64,8 @@ def data_to_csv(data, filename='') -> None:
         dataframe = pd.DataFrame.from_dict(data)
 
     else:
-        dataframe = pd.DataFrame(data, columns=['title', 'text', 'ups', 'downs', 'link_flair_text',
-                                                'upvote_ratio', 'num_comments', 'created_utc', 'url', 'permalink'])
+        dataframe = pd.DataFrame(data, columns=['title', 'selftext', 'ups', 'downs', 'link_flair_text',
+                                                'upvote_ratio', 'num_comments', 'timestamp', 'url', 'permalink'])
 
     dataframe.to_csv(filename, sep=',')
     print(f'> data written to {filename}!')
