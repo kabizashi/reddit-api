@@ -8,22 +8,6 @@ import utils
 
 
 class Reddit:
-    """
-    A class for interacting with Reddit's API using OAuth2 authentication.
-
-    Attributes:
-        AUTH_URL (str): The URL to request an access token from Reddit's API.
-        BASE_URL (str): The base URL for making API requests.
-        client_id (str): The client ID for your Reddit API app.
-        client_secret (str): The client secret for your Reddit API app.
-        user_agent (str): A string identifying your app to Reddit's API.
-        token (str): An OAuth2 access token used to authenticate API requests.
-
-    Methods:
-        fetch_token(): Requests an OAuth2 access token from Reddit's API.
-        fetch_posts(subreddit, limit=5, mode='top', time='year'): Retrieves posts from a subreddit.
-        parse_data(data): Parses and returns data from a Reddit API response.
-    """
     AUTH_URL = 'https://www.reddit.com/api/v1/access_token'
     BASE_URL = 'https://oauth.reddit.com/'
 
@@ -31,45 +15,28 @@ class Reddit:
         self.client_id = config.CLIENT_ID
         self.client_secret = config.CLIENT_SECRET
         self.user_agent = 'PythonAPI/0.1'
-        self.headers = {
-            'User-Agent': self.user_agent
-        }
+        self.headers = {'User-Agent': self.user_agent}
         self.token = None
 
     def fetch_token(self) -> str:
-        """
-        Requests an OAuth2 access token from Reddit's API using the client ID and secret.
-
-        Raises:
-            requests.HTTPError: If the request to the API fails.
-            KeyError: If the response from the API does not contain an access token.
-        """
         print('> fetching access token...')
         auth = requests.auth.HTTPBasicAuth(self.client_id, self.client_secret)
         data = {
             'grant_type': 'client_credentials',
         }
         response = requests.post('https://www.reddit.com/api/v1/access_token',
-                                 auth=auth, data=data, headers=self.headers)
+                                 auth=auth,
+                                 data=data,
+                                 headers=self.headers)
         self.token = response.json()['access_token']
         print('> access token fetched!')
 
-    def fetch_posts(self, subreddit, start_date=datetime.now(), end_date=datetime.now(), limit=5, mode='new') -> list:
-        """
-        Retrieves posts from a subreddit using the Reddit API.
-
-        Parameters:
-            subreddit (str): The name of the subreddit to retrieve posts from.
-            limit (int): The maximum number of posts to retrieve (default 5).
-            mode (str): The sorting mode to use (default 'top').
-            time (str): The time period to retrieve posts from (default 'year').
-
-        Returns:
-            A dictionary containing the response data from the API.
-
-        Raises:
-            requests.HTTPError: If the request to the API fails.
-        """
+    def fetch_posts(self,
+                    subreddit,
+                    start_date=datetime.now(),
+                    end_date=datetime.now(),
+                    limit=5,
+                    mode='new') -> list:
         print('> fetching posts...')
         if not self.token:
             self.fetch_token()
@@ -96,17 +63,29 @@ class Reddit:
                 post = post['data']
 
                 posts.append({
-                    'title': post['title'].lower(),
-                    'author': post['author'],
-                    'selftext': post['selftext'].lower(),
-                    'ups': post['ups'],
-                    'downs': post['downs'],
-                    'link_flair_text': post['link_flair_text'],
-                    'upvote_ratio': post['upvote_ratio'],
-                    'num_comments': post['num_comments'],
-                    'timestamp': utils.datetime_to_str(utils.utc_to_datetime(post['created_utc'])),
-                    'url': post['url'],
-                    'permalink': post['permalink'],
+                    'title':
+                    post['title'].lower(),
+                    'author':
+                    post['author'],
+                    'selftext':
+                    post['selftext'].lower(),
+                    'ups':
+                    post['ups'],
+                    'downs':
+                    post['downs'],
+                    'link_flair_text':
+                    post['link_flair_text'],
+                    'upvote_ratio':
+                    post['upvote_ratio'],
+                    'num_comments':
+                    post['num_comments'],
+                    'timestamp':
+                    utils.datetime_to_str(
+                        utils.utc_to_datetime(post['created_utc'])),
+                    'url':
+                    post['url'],
+                    'permalink':
+                    post['permalink'],
                 })
 
             current_date = utils.utc_to_datetime(post['created_utc'])
@@ -120,5 +99,7 @@ class Reddit:
 
 if __name__ == '__main__':
     api = Reddit()
-    data = api.fetch_posts(
-        'AmizadeVirtual', start_date='01-03-23', end_date='01-03-22', limit=100)
+    data = api.fetch_posts('AmizadeVirtual',
+                           start_date='01-03-23',
+                           end_date='01-03-22',
+                           limit=100)
