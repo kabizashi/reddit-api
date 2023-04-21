@@ -3,7 +3,7 @@ import pandas as pd
 from datetime import datetime
 
 
-def gen_timestamp_str(timestamp: str) -> str:
+def datetime_to_str(timestamp: str) -> str:
     """
     Given a string representation of a timestamp, returns a string
     representation of the timestamp in the format 'HH-MM-SS.DD-MM-YY'.
@@ -14,7 +14,20 @@ def gen_timestamp_str(timestamp: str) -> str:
     Returns:
         A string representation of the timestamp in the format 'HH-MM-SS.DD-MM-YY'.
     """
-    return datetime.strftime(timestamp, '%H-%M-%S.%d-%m-%y')
+    return datetime.strftime(timestamp, '%H:%M:%S|%d-%m-%y')
+
+
+def utc_to_datetime(timestamp: float) -> str:
+    """
+    Converts a UTC float timestamp to a date string in the format 'HH-MM-SS.DD-MM-YY'.
+
+    Parameters:
+        timestamp (float): A UTC float timestamp.
+
+    Returns:
+        A string representation of the timestamp in the format 'HH-MM-SS.DD-MM-YY'.
+    """
+    return datetime.utcfromtimestamp(timestamp)
 
 
 def str_to_datetime(time_string: str) -> str:
@@ -30,7 +43,7 @@ def str_to_datetime(time_string: str) -> str:
     return datetime.strptime(time_string, '%d-%m-%y')
 
 
-def dict_to_csv(data: dict) -> None:
+def data_to_csv(data, filename='') -> None:
     """
     Given a dictionary of data, creates a pandas DataFrame and writes it to a CSV file
     with a filename in the format 'posts-HH-MM-SS.DD-MM-YY.csv', where the timestamp
@@ -44,10 +57,15 @@ def dict_to_csv(data: dict) -> None:
     """
 
     now = datetime.now()
-    timestamp_str = gen_timestamp_str(now)
-    dataframe = pd.DataFrame.from_dict(data)
-    filename = f'posts-{timestamp_str}.csv'
+    timestamp_str = datetime_to_str(now)
+    filename = f'posts-{timestamp_str}.csv' if filename != '' else 'posts.csv'
+
+    if type(data) == 'dict':
+        dataframe = pd.DataFrame.from_dict(data)
+
+    else:
+        dataframe = pd.DataFrame(data, columns=['title', 'selftext', 'ups', 'downs', 'link_flair_text',
+                                                'upvote_ratio', 'num_comments', 'timestamp', 'url', 'permalink'])
 
     dataframe.to_csv(filename, sep=',')
-
     print(f'> data written to {filename}!')
