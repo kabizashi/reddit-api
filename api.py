@@ -97,6 +97,7 @@ class Reddit:
 
                 posts.append({
                     'title': post['title'].lower(),
+                    'author': post['author'],
                     'selftext': post['selftext'].lower(),
                     'ups': post['ups'],
                     'downs': post['downs'],
@@ -120,4 +121,4 @@ class Reddit:
 if __name__ == '__main__':
     api = Reddit()
     data = api.fetch_posts(
-        'conversas', start_date='01-03-23', end_date='01-03-22', limit=100)
+        'AmizadeVirtual', start_date='01-03-23', end_date='01-03-22', limit=100)
